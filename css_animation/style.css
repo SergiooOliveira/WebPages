@@ -1,0 +1,72 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Prevent scrollbars */
+}
+
+.sky {
+    position: relative;
+    background: linear-gradient(to bottom, #87CEEB, #001f3f); /* Day to night gradient */
+    height: 100vh;
+    animation: dayNight 10s linear infinite; /* Cycle duration */
+}
+
+.sun, .moon {
+    position: absolute;
+    border-radius: 50%;
+}
+
+.sun {
+    width: 100px;             /* Sun diameter */
+    height: 100px;            /* Sun diameter */
+    background-color: yellow; /* Sun color */
+    top: 20%;                 /* Position in the sky */
+    left: 0;                  /* Start on the left */
+    animation: moveSun 10s linear infinite; /* Sun animation */
+}
+
+.moon {
+    width: 80px;              /* Moon diameter */
+    height: 80px;             /* Moon diameter */
+    background-color: white;  /* Moon color */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); /* Moon glow */
+    top: 20%;                 /* Start at the same vertical position as the sun */
+    left: 100%;               /* Start on the right, offscreen */
+    animation: moveMoon 10s linear infinite; /* Moon animation */
+}
+
+/* Keyframes for the sun's movement */
+@keyframes moveSun {
+    0% {
+        transform: translateX(0); /* Start on the left */
+    }
+    50% {
+        transform: translateX(100vw); /* Move across to the right */
+    }
+    100% {
+        transform: translateX(0); /* Reset back to the left */
+    }
+}
+
+/* Keyframes for the moon's movement */
+@keyframes moveMoon {
+    0% {
+        transform: translateX(0); /* Start offscreen on the right */
+    }
+    50% {
+        transform: translateX(-100vw); /* Move across to the left */
+    }
+    100% {
+        transform: translateX(0); /* Reset back to the right */
+    }
+}
+
+/* Day and night transition */
+@keyframes dayNight {
+    0%, 100% {
+        background: linear-gradient(to bottom, #87CEEB, #001f3f); /* Day */
+    }
+    50% {
+        background: linear-gradient(to bottom, #001f3f, #87CEEB); /* Night */
+    }
+}
