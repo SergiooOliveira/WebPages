@@ -1,3 +1,4 @@
+// Classe player
 const player = {
     createPlayer: function(name, health, strength) {
         this.name = name,
@@ -26,6 +27,7 @@ const player = {
     }
 }
 
+// Classe enemy
 const enemy = {
     createEnemy: function(enemyType, health, strength) {
         this.enemyType = enemyType,
@@ -50,11 +52,8 @@ const enemy = {
 const player1 = player.createPlayer("Mark", 100, 20)
 const enemy1 = enemy.createEnemy("Goblin", 50, 15)
 
-
 player1.attack()
-player1.playerInfo()
 player1.takeDamage(30)
-enemy1.attack()
 
 const loot = enemy1.dropLoot()
 console.log("Loot type = ", loot.type,". Loot amount = ", loot.amount)
