@@ -3,7 +3,8 @@ const player = {
     createPlayer: function(name, health, strength) {
         this.name = name,
         this.health = health,
-        this.strength = strength
+        this.strength = strength,
+        this.inventory = []
 
         return player
     },
@@ -20,10 +21,28 @@ const player = {
         }
     },
 
+    addItem: function(item) {
+        this.inventory.push(item)
+    },
+
+    removeItem: function(item) {
+        const itemIndex = this.inventory.indexOf(item);
+            if (itemIndex > -1) {
+                this.inventory.splice(itemIndex, 1);
+            } else {
+                console.log("Item not found");
+            }
+    },
+
     playerInfo: function() {
         console.log("Name: ", player.name)
         console.log("Health: ", player.health)
         console.log("Strength: ", player.strength)
+        console.log("Inventory: ")
+        for (let i of player.inventory) {
+            console.log(i);
+        }
+        console.log("////////////////////")
     }
 }
 
@@ -54,6 +73,12 @@ const enemy1 = enemy.createEnemy("Goblin", 50, 15)
 
 player1.attack()
 player1.takeDamage(30)
+player1.addItem("Espada")
+player1.addItem("Escudo")
 
 const loot = enemy1.dropLoot()
 console.log("Loot type = ", loot.type,". Loot amount = ", loot.amount)
+player1.playerInfo()
+
+player1.removeItem("Espadinha")
+player1.playerInfo()
