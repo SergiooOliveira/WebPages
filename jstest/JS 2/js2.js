@@ -4,7 +4,8 @@ const player = {
         this.name = name,
         this.health = health,
         this.strength = strength,
-        this.inventory = []
+        this.inventory = [],
+        this.skillTree = []
 
         return player
     },
@@ -26,12 +27,36 @@ const player = {
     },
 
     removeItem: function(item) {
-        const itemIndex = this.inventory.indexOf(item);
-            if (itemIndex > -1) {
-                this.inventory.splice(itemIndex, 1);
-            } else {
-                console.log("Item not found");
+        const itemIndex = this.inventory.indexOf(item)
+        if (itemIndex > -1) {
+            this.inventory.splice(itemIndex, 1)
+        } else {
+            console.log("Item not found")
+        }
+    },
+
+    createSkill: function(name) {
+        this.name = name,
+        this.level = 0
+
+        // Verify is skill already exists before adding
+        for (let i = 0; i < player.skillTree.length; i++) {
+            if (player.skillTree[i][0] == this.name) {
+                console.log(this.name, "is already a skill")
+                return
             }
+        }
+
+        this.skillTree.push([this.name, this.level])
+    },
+
+
+
+    increaseSkillLevel: function(skill) {              
+        return {
+            name: skill.name,
+            level: skill.level + 1
+        }
     },
 
     playerInfo: function() {
@@ -42,6 +67,10 @@ const player = {
         for (let i of player.inventory) {
             console.log(i);
         }
+        console.log("Skills: ")
+        for (let i = 0; i < player.skillTree.length; i++) {
+            console.log("Name:", player.skillTree[i][0], " Level:", player.skillTree[i][1]);
+        }        
         console.log("////////////////////")
     }
 }
@@ -75,10 +104,17 @@ player1.attack()
 player1.takeDamage(30)
 player1.addItem("Espada")
 player1.addItem("Escudo")
-
+player1.createSkill("Curar")
+player1.createSkill("Raio")
+player1.createSkill("Bash")
+player1.createSkill("Curar")
 const loot = enemy1.dropLoot()
-console.log("Loot type = ", loot.type,". Loot amount = ", loot.amount)
+
 player1.playerInfo()
 
-player1.removeItem("Espadinha")
-player1.playerInfo()
+console.log("/////////////////")
+console.log("Upgraded Skills")
+const upgradedSkills = player1.skillTree.map(player1.increaseSkillLevel)
+for (let i = 0; i < upgradedSkills.length; i++) {
+    console.log("Name:", upgradedSkills[i][0], " Level:", upgradedSkills[i][1]);
+}   
