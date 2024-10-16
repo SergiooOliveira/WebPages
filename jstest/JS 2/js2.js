@@ -12,8 +12,8 @@ const player = {
         return player
     },
         
-    attack: function() {
-        console.log(this.strength)
+    attack: function(enemy) {
+        enemy.health -= this.strength
     },
 
     takeDamage: function(damage) {
@@ -111,8 +111,8 @@ const enemy = {
         return enemy
     },
 
-    attack: function() {
-        console.log(this.strength)
+    attack: function(player) {
+        player.health -= this.strength
     },
 
     dropLoot: function() {
@@ -180,11 +180,27 @@ const healthItems = [
     }
 ]
 
+const combatRound = function(player, enemy) {
+    let i = 0
+    do {        
+        player.attack(enemy)
+        enemy.attack(player)
+        console.log("Round", i++)
+        console.log(player.health)
+        console.log(enemy.health)
+    } while (player.health > 0 && enemy.health > 0)
+
+    if (player.health <= 0 && enemy.health <= 0)
+        console.log("Draw")
+    else if (player.health <= 0)
+        console.log("Enemy won")
+    else
+        console.log("Player won")
+}
+
 //#region variables
 const player1 = player.createPlayer("Mark", 100, 20)
 const enemy1 = enemy.createEnemy("Goblin", 50, 15)
-player1.attack()
-player1.takeDamage(30)
 player1.addItem("Sword", 1, "Weapon")
 player1.addItem("Shield", 1, "Equipment")
 player1.addItem("Gold", 50, "Money")
@@ -197,11 +213,6 @@ player1.increaseScore(9)
 player1.increaseScore(14)
 const loot = enemy1.dropLoot()
 //#endregion
-
-player1.playerInfo()
-
-console.log("/////////////////")
-console.log("Upgraded Skills")
 
 // .map Skills
 const upgradedSkills = player1.skillTree.map(skill => player1.increaseSkillLevel({
@@ -229,9 +240,17 @@ const totalHealthRestore = healthItems.reduce((accumulator, item) => {
     return accumulator + (item.restore * item.quantity);
 }, 0);
 
+// combatRound
+combatRound(player, enemy)
+
+
+
+/* 
+player1.playerInfo()
 console.log(upgradedSkills)
 console.log(boostedAbilities)
 console.log(weapons)
 console.log(hardChallenges)
 console.log(totalScore)
 console.log(totalHealthRestore)
+*/
