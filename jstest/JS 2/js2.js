@@ -2,8 +2,10 @@
 const player = {
     createPlayer: function(name, health, strength) {
         this.name = name,
-        this.health = health,
+        this.maxHealth = health,
+        this.currentHealth = health,
         this.strength = strength,
+        this.defeatedEnemies = 0,
         this.inventory = [],
         this.healthItems = [],
         this.skillTree = [],
@@ -18,9 +20,9 @@ const player = {
     },
 
     takeDamage: function(damage) {
-        this.health -= damage
+        this.currentHealth -= damage
         console.log("Player took ", damage," damage")
-        if (this.health <= 0) {
+        if (this.currentHealth <= 0) {
             console.log("Player is dead")
         }
     },
@@ -46,8 +48,7 @@ const player = {
         }
     },
 
-    addPotion: function(name, restore, quantity) {
-        console.log("Found potion:", name, restore, quantity)
+    addPotion: function(name, restore, quantity) {        
         if (restore == 30) {
             const itemIndex = this.healthItems.findIndex(potion => potion[1] == 30)
             if (itemIndex > -1) {
@@ -66,7 +67,40 @@ const player = {
     },
 
     usePotion: function() {
-        // Use potion to restore hp
+        /* 
+            Use potion to restore hp
+            Check playerHp
+            If playerHP <= 40 = Use 60 Potion
+            Else use 30 potion
+        */
+        if (player.currentHealth <= 40) {
+            const itemIndex = this.healthItems.findIndex(potion => potion[1] == 60)
+            if (itemIndex > -1) {
+                this.healthItems[itemIndex][2]--
+                this.currentHealth += 60
+                console.log("Restore life to", player.currentHealth)
+            } else {
+                console.log("No 60 potion")
+                const itemIndex = this.healthItems.findIndex(potion => potion[1] == 30)
+                if (itemIndex > -1) {
+                    this.healthItems[itemIndex][2]--
+                    this.currentHealth += 30
+                    console.log("Restore life to", player.currentHealth)
+                } else
+                    console.log("No potions") 
+            }
+        } else if (player.currentHealth <= 70) {
+            const itemIndex = this.healthItems.findIndex(potion => potion[1] == 30)
+            if (itemIndex > -1) {
+                this.healthItems[itemIndex][2]--
+                this.currentHealth += 30
+                console.log("Restore life to", player.currentHealth)
+            } else
+                console.log("No potions") 
+        } else
+            console.log("Health at", this.currentHealth)
+
+        this.currentHealth = this.currentHealth > this.maxHealth ? this.maxHealth : this.currentHealth
     },
 
     createSkill: function(name) {
@@ -117,18 +151,13 @@ const player = {
         this.score.push(score)
     },
 
-    playerInfo: function() {
-        console.log("Name: ", player.name)
-        console.log("Health: ", player.health)
-        console.log("Strength: ", player.strength)
+    playerInfo: function(eventCount) {
         console.log("Inventory: ")
         for (let i of player.inventory) {
             console.log(i);
         }
-        console.log("Potions")
-        for (let i of player.healthItems) {
-            console.log(i);
-        }
+        console.log("Number of iterations:", eventCount)
+        console.log("Number of enemies defeated:", this.defeatedEnemies)
     }
 }
 
@@ -143,7 +172,7 @@ const enemy = {
     },
 
     attack: function(player) {
-        player.health -= this.strength
+        player.currentHealth -= this.strength
     },
 
     dropLoot: function() {
@@ -204,23 +233,24 @@ const combatRound = function(player, enemy) {
         player.attack(enemy)
         enemy.attack(player)
         /* console.log("Round", i++)
-        console.log(player.health)
+        console.log(player.currentHealth)
         console.log(enemy.health) */
-    } while (player.health > 0 && enemy.health > 0)
+    } while (player.currentHealth > 0 && enemy.health > 0)
 
-    if (player.health <= 0 && enemy.health <= 0) {
+    if (player.currentHealth <= 0 && enemy.health <= 0) {
         // Draw
         console.log("Draw")
     }
-    else if (player.health <= 0) {
+    else if (player.currentHealth <= 0) {
         // Enemy won
-        console.log("Enemy won")
+        console.log("Player died to", enemy.enemyType)
     }
     else {
         // Player won
-        console.log("Player won with", player.health, "left")
+        console.log("Player won with", player.currentHealth, "hp left")
         enemyLoot = enemy.dropLoot()
         player.addItem(enemyLoot.name, enemyLoot.amount, enemyLoot.type)
+        player.defeatedEnemies++
     }
     
     return player
@@ -246,9 +276,9 @@ function delay(ms) {
 
 async function simulateGame(player) {
     console.log("Starting game")
+    let eventCount = 0
     do {
         let event = randomEvent()
-        console.log("Evento:", event)
         switch (event) {
             case 1: {
                 /* 
@@ -274,7 +304,7 @@ async function simulateGame(player) {
                     } break
                 }
                 const enemy1 = enemy.createEnemy(enemyType, enemyLife, enemyStrength)
-                
+                console.log("Player found an enemy:", enemyType)
                 player = combatRound(player, enemy1)
             } break
             case 2: {
@@ -283,11 +313,12 @@ async function simulateGame(player) {
                     Potion restore -> 30 or 40
                     Potion Quantity -> 1 to 3
                 */
-               let potionName = "Potion"
-               let potionRestoreDef = Math.floor((Math.random() * 2) + 1)
-               let potionRestore = potionRestoreDef === 1 ? 30 : 60
-               let potionQuantity = Math.floor((Math.random() * 3) + 1)
-               player.addPotion(potionName, potionRestore, potionQuantity)
+                console.log("Found a potion")
+                let potionName = "Potion"
+                let potionRestoreDef = Math.floor((Math.random() * 2) + 1)
+                let potionRestore = potionRestoreDef === 1 ? 30 : 60
+                let potionQuantity = Math.floor((Math.random() * 3) + 1)
+                player.addPotion(potionName, potionRestore, potionQuantity)
             } break
             case 3: {
                 /*
@@ -348,15 +379,15 @@ async function simulateGame(player) {
             } break
         }
 
-        //await delay(500);
-    } while (player.health > 0)    
-    player.playerInfo()
+        await delay(500);
+        eventCount++
+    } while (player.currentHealth > 0)    
+    player.playerInfo(eventCount)
 }
 
 //#region variables
 const player1 = player.createPlayer("Mark", 100, 20)
-const enemy1 = enemy.createEnemy("Goblin", 50, 15)
-player1.addItem("Sword", 1, "Weapon")
+/* player1.addItem("Sword", 1, "Weapon")
 player1.addItem("Shield", 1, "Equipment")
 player1.addItem("Gold", 50, "Money")
 player1.addItem("Staff", 1, "Weapon")
@@ -365,7 +396,8 @@ player1.createAbility("Força")
 player1.increaseScore(10)
 player1.increaseScore(9)
 player1.increaseScore(14)
-const loot = enemy1.dropLoot()
+const enemy1 = enemy.createEnemy("Goblin", 50, 15)
+const loot = enemy1.dropLoot() */
 /* const healthItems = [
     {
         "name": "Potion",
@@ -427,5 +459,3 @@ console.log(hardChallenges)
 console.log(totalScore)
 console.log(totalHealthRestore)
 */
-
-
