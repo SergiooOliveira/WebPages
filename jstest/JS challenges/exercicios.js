@@ -1,3 +1,5 @@
+// Sérgio Oliveira - a15656
+
 // EX: 1
 console.log("Ex: 1");
 
