@@ -1,3 +1,5 @@
+// Sérgio Oliveira - a15656
+
 // Classe player
 const player = {
     createPlayer: function(name, health, strength) {
